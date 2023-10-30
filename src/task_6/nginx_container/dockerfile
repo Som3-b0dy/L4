@@ -1,0 +1,16 @@
+FROM nginx:1.25.2
+
+LABEL version="1.0"
+
+RUN apt update -y && apt upgrade -y && apt install libfcgi-dev -y && apt install spawn-fcgi -y && apt install gcc -y && rm -rf /var/lib/apt/lists
+
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+
+RUN find /usr/bin -type f -perm /4000 ! -perm /2000 -exec chmod u-s {} +
+RUN find /usr/bin -type f -perm /2000 ! -perm /4000 -exec chmod g-s {} +
+RUN find /usr/sbin -type f -perm /2000 ! -perm /4000 -exec chmod g-s {} +
+
+WORKDIR /usr/share/nginx/
+USER nginx
+
+HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:80/ || exit 1

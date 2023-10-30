@@ -1,0 +1,26 @@
+version: '3'
+services:
+  srv:
+    build:
+      context: ./server_container
+      dockerfile: dockerfile
+    image: server_container:1.0
+    user: root
+    volumes:
+      - ./server_container/nginx/:/etc/nginx/
+
+  ngx:
+    build:
+      context: ./nginx_container
+      dockerfile: dockerfile
+    image: nginx_container:1.0
+    user: root
+    depends_on:
+      - srv
+    ports:
+      - 80:8080
+    volumes:
+      - ./nginx_container/nginx/:/etc/nginx/
+
+# docker-compose build
+# docker-compose up
